@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DB}"
+    ports:
+      - "${MYSQL_PORT}:3306"
+    networks:
+      - intelliconetwork
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  adminer-service:
+    image: adminer:latest
+    restart: unless-stopped
+    container_name: intellico-adminer
+    depends_on:
+      - mysql
+    networks:
+      - intelliconetwork
+    ports:
+      - "8080:8080"
+
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: intellico-fastapi
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    ports:
+      - "8000:8000"
+    networks:
+      - intelliconetwork
+
+  frontend:
+    image: intellico-frontend
+    container_name: intellico-frontend
+    restart: unless-stopped
+    ports:
+      - "5137:5137"
+    networks:
+      - intelliconetwork
+
+networks:
+  intelliconetwork:
+
+volumes:
+  mysql_data:

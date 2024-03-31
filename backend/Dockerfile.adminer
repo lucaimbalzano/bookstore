@@ -1,0 +1,5 @@
+FROM adminer:latest
+
+RUN mkdir -p /var/www/html/adminer
+
+COPY adminer.css /var/www/html/
